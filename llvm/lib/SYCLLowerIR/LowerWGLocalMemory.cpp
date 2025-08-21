@@ -73,7 +73,7 @@ sycl::getKernelNamesUsingImplicitLocalMem(const Module &M) {
     llvm::for_each(M.functions(), [&](const Function &F) {
       if (F.getCallingConv() == CallingConv::SPIR_KERNEL) {
         int ArgPos = GetArgumentPos(F);
-        if (ArgPos >= 0)
+        if (ArgPos >= 0 || F.hasFnAttribute(WORK_GROUP_STATIC_ATTR))
           SPIRKernelNames.emplace_back(F.getName(), ArgPos);
       }
     });
