@@ -254,7 +254,6 @@ __attribute__((sycl_device))
 void ff_20(sycl::accessor<int, 1, sycl::access::mode::read_write> acc) {
 }
 
-<<<<<<< HEAD
 [[__sycl_detail__::add_ir_attributes_function("work_group_size", 16)]]
 [[__sycl_detail__::add_ir_attributes_function("sycl-nd-range-kernel", 0)]]
 void ff_21(AliasType start, AliasType *ptr) {
@@ -277,6 +276,49 @@ void ff_24(int arg);
 
 [[__sycl_detail__::add_ir_attributes_function("sycl-single-task-kernel", 0)]]
 void ff_24(int arg) { 
+}
+
+// Tests with parameter types that are structs that contain special types inside e.g accessor
+
+struct AccessorAndLocalAccessor {
+    sycl::accessor<int, 1, sycl::access::mode::read_write> acc;
+    sycl::local_accessor<int, 1> lacc;
+};
+
+struct AccessorAndInt {
+    sycl::accessor<int, 1, sycl::access::mode::read_write> acc;
+    int a;
+};
+
+struct IntAndAccessor {
+    int a;
+    sycl::accessor<int, 1, sycl::access::mode::read_write> acc;
+};
+
+struct SecondLevelAccessor {
+    AccessorAndInt accAndInt;
+};
+
+template <typename T>
+struct TemplatedAccessorStruct {
+    sycl::accessor<T, 1, sycl::access::mode::read_write> acc;
+    sycl::local_accessor<T, 1> lacc;
+};
+
+[[__sycl_detail__::add_ir_attributes_function("sycl-single-task-kernel", 0)]]
+void ff_25(AccessorAndLocalAccessor arg1) {
+}
+
+[[__sycl_detail__::add_ir_attributes_function("sycl-single-task-kernel", 0)]]
+void ff_26(AccessorAndLocalAccessor arg1, SecondLevelAccessor arg2) {
+}
+
+[[__sycl_detail__::add_ir_attributes_function("sycl-single-task-kernel", 0)]]
+void ff_27(IntAndAccessor arg1, AccessorAndInt) {
+}
+
+[[__sycl_detail__::add_ir_attributes_function("sycl-single-task-kernel", 0)]]
+void ff_28(TemplatedAccessorStruct<int> arg1) {
 }
 
 // CHECK:      const char* const kernel_names[] = {
@@ -311,13 +353,15 @@ void ff_24(int arg) {
 // CHECK-NEXT:   {{.*}}__sycl_kernel_free_functions5tests5ff_18ENS_3AggEPS1_
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_19N14free_functions16KArgWithPtrArrayILi50EEE
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_20N4sycl3_V18accessorIiLi1ELNS0_6access4modeE1026ELNS2_6targetE2014ELNS2_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEE
-<<<<<<< HEAD
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_217DerivedPS_
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_227DerivedPS_
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_24i"
+// CHECK-NEXT:   {{.*}}__sycl_kernel_ff_2524AccessorAndLocalAccessor",
+// CHECK-NEXT:   {{.*}}__sycl_kernel_ff_2624AccessorAndLocalAccessor19SecondLevelAccessor",
+// CHECK-NEXT:   {{.*}}__sycl_kernel_ff_2714IntAndAccessor14AccessorAndInt",
+// CHECK-NEXT:   {{.*}}__sycl_kernel_ff_2823TemplatedAccessorStructIiE",
+
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_23i"
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 
 // CHECK-NEXT:   ""
 // CHECK-NEXT: };
@@ -325,39 +369,39 @@ void ff_24(int arg) {
 // CHECK:      const kernel_param_desc_t kernel_signatures[] = {
 // CHECK-NEXT:   {{.*}}__sycl_kernel_ff_2Piii
 // CHECK-NEXT:   { kernel_param_kind_t::kind_pointer, 8, 0 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 8 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 12 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
 // CHECK:        {{.*}}__sycl_kernel_ff_2Piiii
 // CHECK-NEXT:   { kernel_param_kind_t::kind_pointer, 8, 0 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 8 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 12 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 16 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
 // CHECK:        {{.*}}__sycl_kernel_ff_3IiEvPT_S0_S0_
 // CHECK-NEXT:   { kernel_param_kind_t::kind_pointer, 8, 0 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 8 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 12 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
 // CHECK:        {{.*}}__sycl_kernel_ff_3IfEvPT_S0_S0_
 // CHECK-NEXT:   { kernel_param_kind_t::kind_pointer, 8, 0 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 8 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 12 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
 // CHECK:        {{.*}}__sycl_kernel_ff_3IdEvPT_S0_S0_
 // CHECK-NEXT:   { kernel_param_kind_t::kind_pointer, 8, 0 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 8, 8 },
-// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 8, 16 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 8, 0 },
+// CHECK-NEXT:   { kernel_param_kind_t::kind_std_layout, 8, 0 },
 
 // CHECK:  //--- _Z18__sycl_kernel_ff_410NoPointers8Pointers3Agg
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 16, 4 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 32, 20 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 16, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 32, 0 },
 
 // CHECK:  //--- _Z18__sycl_kernel_ff_6I3Agg7DerivedEvT_T0_i
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 32, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 40, 32 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 72 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 40, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
 // CHECK:  //--- _Z18__sycl_kernel_ff_7ILi3EEv16KArgWithPtrArrayIXT_EE
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 48, 0 },
@@ -368,27 +412,27 @@ void ff_24(int arg) {
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions4ff_9EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5tests5ff_10EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5tests2V15ff_11EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN26__sycl_kernel__GLOBAL__N_15ff_12EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5ff_13EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5tests5ff_13EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 }, 
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _Z18__sycl_kernel_ff_9N4sycl3_V125dynamic_work_group_memoryIiEE
 // CHECK-NEXT:  { kernel_param_kind_t::kind_dynamic_work_group_memory, 8, 0 },
@@ -413,23 +457,23 @@ void ff_24(int arg) {
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5tests5ff_14EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5ff_15EiPi
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5ff_16E3AggPS0_
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 32, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 32 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5ff_17E7DerivedPS0_
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 40, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 40 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK:  //--- _ZN28__sycl_kernel_free_functions5tests5ff_18ENS_3AggEPS1_
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 8, 0 },
-// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 8 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_pointer, 8, 0 },
 
 // CHECK: //--- _Z19__sycl_kernel_ff_19N14free_functions16KArgWithPtrArrayILi50EEE
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 800, 0 },
@@ -437,15 +481,38 @@ void ff_24(int arg) {
 // CHECK: //--- _Z19__sycl_kernel_ff_20N4sycl3_V18accessorIiLi1ELNS0_6access4modeE1026ELNS2_6targetE2014ELNS2_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEE
 // CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
 
-<<<<<<< HEAD
 // CHECK: //--- _Z19__sycl_kernel_ff_24i
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
+
+// CHECK: //--- _Z19__sycl_kernel_ff_2524AccessorAndLocalAccessor
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 36, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4064, 12 },
+
+// CHECK:  //--- _Z19__sycl_kernel_ff_2624AccessorAndLocalAccessor19SecondLevelAccessor
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 36, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4064, 12 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 16, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 12 },
+
+// CHECK:  //--- _Z19__sycl_kernel_ff_2714IntAndAccessor14AccessorAndInt
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 16, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 4 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 16, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 12 },
+
+// CHECK:  //--- _Z19__sycl_kernel_ff_2823TemplatedAccessorStructIiE
+// CHECK-NEXT:  { kernel_param_kind_t::kind_struct_with_special_type, 36, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4062, 0 },
+// CHECK-NEXT:  { kernel_param_kind_t::kind_accessor, 4064, 12 },
 
 // CHECK: //--- _Z19__sycl_kernel_ff_23i
 // CHECK-NEXT:  { kernel_param_kind_t::kind_std_layout, 4, 0 },
 
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK:        { kernel_param_kind_t::kind_invalid, -987654321, -987654321 },
 // CHECK-NEXT: };
 
@@ -998,7 +1065,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: template <typename dataT, int dimensions> class local_accessor;
 
 // CHECK: void ff_11(sycl::local_accessor<int, 1> lacc);
-<<<<<<< HEAD
 // CHECK-NEXT: static constexpr auto __sycl_shim17
 // CHECK-NEXT:  return (void (*)(class sycl::local_accessor<int, 1>))ff_11;
 
@@ -1017,12 +1083,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
-// CHECK-NEXT: static constexpr auto __sycl_shim
-// CHECK-NEXT:  return (void (*)(class sycl::local_accessor<int, 1>))ff_11;
-
-// CHECK: namespace sycl {
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT:  static constexpr bool value = true;
@@ -1035,16 +1095,11 @@ void ff_24(int arg) {
 
 // CHECK: Forward declarations of kernel and its argument types:
 
-<<<<<<< HEAD
 // CHECK: template <typename DataT> void ff_11(sycl::local_accessor<DataT, 1>);
-=======
-// CHECK: template <typename DataT> void ff_11(sycl::local_accessor<DataT, 1> lacc);
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: static constexpr auto __sycl_shim
 // CHECK-NEXT:  return (void (*)(class sycl::local_accessor<float, 1>))ff_11<float>;
 
 // CHECK: namespace sycl {
-<<<<<<< HEAD
 // CHECK-NEXT: inline namespace _V1 {
 // CHECK-NEXT: namespace detail {
 // CHECK-NEXT: //Free Function Kernel info specialization for shim18
@@ -1059,8 +1114,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT: static constexpr bool value = true;
@@ -1080,7 +1133,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: return (void (*)(class sycl::sampler))ff_12;
 
 // CHECK: namespace sycl {
-<<<<<<< HEAD
 // CHECK-NEXT: inline namespace _V1 {
 // CHECK-NEXT: namespace detail {
 // CHECK-NEXT: //Free Function Kernel info specialization for shim19
@@ -1095,8 +1147,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT: static constexpr bool value = true;
@@ -1116,7 +1166,6 @@ void ff_24(int arg) {
 // CHECK-NEXT:  return (void (*)(class sycl::stream))ff_13;
 
 // CHECK: namespace sycl {
-<<<<<<< HEAD
 // CHECK: inline namespace _V1 {
 // CHECK: namespace detail {
 // CHECK: //Free Function Kernel info specialization for shim20
@@ -1131,8 +1180,6 @@ void ff_24(int arg) {
 // CHECK: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT:  static constexpr bool value = true;
@@ -1152,7 +1199,6 @@ void ff_24(int arg) {
 // CHECK-NEXT:  return (void (*)(class sycl::ext::oneapi::experimental::annotated_arg<int>))ff_14;
 
 // CHECK: namespace sycl {
-<<<<<<< HEAD
 // CHECK-NEXT: inline namespace _V1 {
 // CHECK-NEXT: namespace detail {
 // CHECK-NEXT: //Free Function Kernel info specialization for shim21
@@ -1167,8 +1213,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT: static constexpr bool value = true;
@@ -1188,7 +1232,6 @@ void ff_24(int arg) {
 // CHECK-NEXT:  return (void (*)(class sycl::ext::oneapi::experimental::annotated_ptr<int>))ff_15;
 
 // CHECK: namespace sycl {
-<<<<<<< HEAD
 // CHECK-NEXT: inline namespace _V1 {
 // CHECK-NEXT: namespace detail {
 // CHECK-NEXT: //Free Function Kernel info specialization for shim22
@@ -1203,8 +1246,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel
 // CHECK-NEXT:  static constexpr bool value = true;
@@ -1449,7 +1490,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: static constexpr auto __sycl_shim29() {
 // CHECK-NEXT:  return (void (*)(class sycl::accessor<int, 1, sycl::access::mode::read_write, sycl::access::target::global_buffer, sycl::access::placeholder::false_t, class sycl::ext::oneapi::accessor_property_list<> >))ff_20;
 // CHECK-NEXT: }
-<<<<<<< HEAD
 
 // CHECK: namespace sycl {
 // CHECK-NEXT: inline namespace _V1 {
@@ -1466,9 +1506,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: } // namespace sycl
 
 // CHECK: namespace sycl {
-=======
-// CHECK-NEXT: namespace sycl {
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK-NEXT: template <>
 // CHECK-NEXT: struct ext::oneapi::experimental::is_kernel<__sycl_shim29()> {
 // CHECK-NEXT: static constexpr bool value = true;
@@ -1477,7 +1514,6 @@ void ff_24(int arg) {
 // CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim29()> {
 // CHECK-NEXT: static constexpr bool value = true;
 // CHECK-NEXT: };
-<<<<<<< HEAD
 
 // CHECK: void ff_21(Derived start, Derived * ptr);
 // CHECK-NEXT: static constexpr auto __sycl_shim30() {
@@ -1569,18 +1605,147 @@ void ff_24(int arg) {
 // CHECK-NEXT: static constexpr bool value = true;
 // CHECK-NEXT: };
 
+// CHECK: Definition of _Z19__sycl_kernel_ff_2524AccessorAndLocalAccessor as a free function kernel
+// CHECK: Forward declarations of kernel and its argument types:
+// CHECK: void ff_25(AccessorAndLocalAccessor arg1);
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::is_device_copyable<AccessorAndLocalAccessor>: std::true_type {};
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::ext::oneapi::experimental::detail::is_struct_with_special_type<AccessorAndLocalAccessor> {
+// CHECK-NEXT: inline static constexpr bool value = true;
+// CHECK-NEXT: static constexpr int offsets[] = { 0, 12, -1};
+// CHECK-NEXT: static constexpr int sizes[] = { 4062, 4064, -1}; 
+// CHECK-NEXT: static constexpr sycl::detail::kernel_param_kind_t kinds[] = {
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_invalid }; 
+// CHECK-NEXT: };
+
+// CHECK: static constexpr auto __sycl_shim33() {
+// CHECK-NEXT:  return (void (*)(struct AccessorAndLocalAccessor))ff_25;
+// CHECK-NEXT: }
+
+// CHECK: struct ext::oneapi::experimental::is_kernel<__sycl_shim33()> {
+// CHECK-NEXT:  static constexpr bool value = true;
+// CHECK-NEXT: };
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim33()> {
+// CHECK-NEXT:  static constexpr bool value = true;
+// CHECK-NEXT: };
+
+// CHECK: Definition of _Z19__sycl_kernel_ff_2624AccessorAndLocalAccessor19SecondLevelAccessor as a free function kernel
+// CHECK: Forward declarations of kernel and its argument types:
+// CHECK: void ff_26(AccessorAndLocalAccessor arg1, SecondLevelAccessor arg2);
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::is_device_copyable<SecondLevelAccessor>: std::true_type {};
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::ext::oneapi::experimental::detail::is_struct_with_special_type<SecondLevelAccessor> {
+// CHECK-NEXT: inline static constexpr bool value = true;
+// CHECK-NEXT: static constexpr int offsets[] = { 0, 12, -1};
+// CHECK-NEXT: static constexpr int sizes[] = { 4062, 4, -1}; 
+// CHECK-NEXT: static constexpr sycl::detail::kernel_param_kind_t kinds[] = {
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_std_layout,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_invalid }; 
+// CHECK-NEXT: };
+
+// CHECK: static constexpr auto __sycl_shim34() {
+// CHECK-NEXT:  return (void (*)(struct AccessorAndLocalAccessor, struct SecondLevelAccessor))ff_26;
+// CHECK-NEXT: }
+
+// CHECK: struct ext::oneapi::experimental::is_kernel<__sycl_shim34()> {
+// CHECK-NEXT:  static constexpr bool value = true;
+// CHECK-NEXT: };
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim34()> {
+// CHECK-NEXT: static constexpr bool value = true;
+// CHECK-NEXT };
+
+// CHECK: Definition of _Z19__sycl_kernel_ff_2714IntAndAccessor14AccessorAndInt as a free function kernel
+// CHECK: Forward declarations of kernel and its argument types:
+// CHECK: void ff_27(IntAndAccessor arg1, AccessorAndInt );
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::is_device_copyable<IntAndAccessor>: std::true_type {};
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::ext::oneapi::experimental::detail::is_struct_with_special_type<IntAndAccessor> {
+// CHECK-NEXT: inline static constexpr bool value = true;
+// CHECK-NEXT: static constexpr int offsets[] = { 0, 4, -1};
+// CHECK-NEXT: static constexpr int sizes[] = { 4, 4062, -1}; 
+// CHECK-NEXT: static constexpr sycl::detail::kernel_param_kind_t kinds[] = {
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_std_layout,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_invalid }; 
+// CHECK-NEXT: };
+
+// CHECK: template <>
+// CHECK-NEXT: struct sycl::is_device_copyable<AccessorAndInt>: std::true_type {};
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::ext::oneapi::experimental::detail::is_struct_with_special_type<AccessorAndInt> {
+// CHECK-NEXT: inline static constexpr bool value = true;
+// CHECK-NEXT: static constexpr int offsets[] = { 0, 12, -1};
+// CHECK-NEXT: static constexpr int sizes[] = { 4062, 4, -1}; 
+// CHECK-NEXT: static constexpr sycl::detail::kernel_param_kind_t kinds[] = {
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_std_layout,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_invalid }; 
+// CHECK-NEXT: };
+
+
+
+// CHECK: static constexpr auto __sycl_shim35() {
+// CHECK-NEXT: return (void (*)(struct IntAndAccessor, struct AccessorAndInt))ff_27;
+// CHECK-NEXT: }
+
+// CHECK: struct ext::oneapi::experimental::is_kernel<__sycl_shim35()> {
+// CHECK-NEXT: static constexpr bool value = true;
+// CHECK-NEXT: };
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim35()> {
+// CHECK-NEXT: static constexpr bool value = true;
+// CHECK-NEXT: };
+
+
+// CHECK: Definition of _Z19__sycl_kernel_ff_2823TemplatedAccessorStructIiE as a free function kernel
+// CHECK: Forward declarations of kernel and its argument types:
+// CHECK: template <typename T> struct TemplatedAccessorStruct;
+// CHECK: void ff_28(TemplatedAccessorStruct<int> arg1);
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::is_device_copyable<TemplatedAccessorStruct<int>>: std::true_type {};
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct sycl::ext::oneapi::experimental::detail::is_struct_with_special_type<TemplatedAccessorStruct<int>> {
+// CHECK-NEXT: inline static constexpr bool value = true;
+// CHECK-NEXT: static constexpr int offsets[] = { 0, 12, -1};
+// CHECK-NEXT: static constexpr int sizes[] = { 4062, 4064, -1}; 
+// CHECK-NEXT: static constexpr sycl::detail::kernel_param_kind_t kinds[] = {
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT: sycl::detail::kernel_param_kind_t::kind_accessor,
+// CHECK-NEXT  sycl::detail::kernel_param_kind_t::kind_invalid }; 
+// CHECK-NEXT: };
+
+// CHECK: static constexpr auto __sycl_shim36() {
+// CHECK-NEXT: return (void (*)(struct TemplatedAccessorStruct<int>))ff_28;
+// CHECK-NEXT: }
+
+// CHECK: struct ext::oneapi::experimental::is_kernel<__sycl_shim36()> {
+// CHECK-NEXT: static constexpr bool value = true;
+// CHECK-NEXT: };
+// CHECK-NEXT: template <>
+// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim36()> {
+// CHECK-NEXT: static constexpr bool value = true;
+// CHECK-NEXT: };
+
 // CHECK: Definition of _Z19__sycl_kernel_ff_23i as a free function kernel
 // CHECK: Forward declarations of kernel and its argument types:
 // CHECK: void ff_23(int arg);
-// CHECK-NEXT: static constexpr auto __sycl_shim33() {
+// CHECK-NEXT: static constexpr auto __sycl_shim37() {
 // CHECK-NEXT: return (void (*)(int))ff_23;
 // CHECK-NEXT: }
 
 // CHECK: namespace sycl {
 // CHECK-NEXT: inline namespace _V1 {
 // CHECK-NEXT: namespace detail {
-// CHECK-NEXT: //Free Function Kernel info specialization for shim33
-// CHECK-NEXT: template <> struct FreeFunctionInfoData<__sycl_shim33()> {
+// CHECK-NEXT: //Free Function Kernel info specialization for shim37
+// CHECK-NEXT: template <> struct FreeFunctionInfoData<__sycl_shim37()> {
 // CHECK-NEXT: 	__SYCL_DLL_LOCAL
 // CHECK-NEXT: 	static constexpr unsigned getNumParams() { return 1; }
 // CHECK-NEXT: 	__SYCL_DLL_LOCAL
@@ -1592,233 +1757,27 @@ void ff_24(int arg) {
 
 // CHECK: namespace sycl {
 // CHECK-NEXT: template <>
-// CHECK-NEXT: struct ext::oneapi::experimental::is_kernel<__sycl_shim33()> {
+// CHECK-NEXT: struct ext::oneapi::experimental::is_kernel<__sycl_shim37()> {
 // CHECK-NEXT: static constexpr bool value = true;
 // CHECK-NEXT: };
 // CHECK-NEXT: template <>
-// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim33()> {
+// CHECK-NEXT: struct ext::oneapi::experimental::is_single_task_kernel<__sycl_shim37()> {
 // CHECK-NEXT: static constexpr bool value = true;
 // CHECK-NEXT: };
 
 // CHECK-NEXT: }
 
 
-=======
-// CHECK-NEXT: }
-
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK: #include <sycl/kernel_bundle.hpp>
 // CHECK-NEXT: #include <sycl/detail/kernel_global_info.hpp>
 // CHECK-NEXT: namespace {
 // CHECK-NEXT: struct GlobalMapUpdater {
 // CHECK-NEXT:  GlobalMapUpdater() {
-// CHECK-NEXT:     sycl::detail::free_function_info_map::add(sycl::detail::kernel_names, sycl::detail::kernel_args_sizes, 33);
+// CHECK-NEXT:     sycl::detail::free_function_info_map::add(sycl::detail::kernel_names, sycl::detail::kernel_args_sizes, 37);
 // CHECK-NEXT:   }
 // CHECK-NEXT:  ~GlobalMapUpdater() {
-// CHECK-NEXT:     sycl::detail::free_function_info_map::remove(sycl::detail::kernel_names, sycl::detail::kernel_args_sizes, 33);
+// CHECK-NEXT:     sycl::detail::free_function_info_map::remove(sycl::detail::kernel_names, sycl::detail::kernel_args_sizes, 37);
 // CHECK-NEXT:   }
 // CHECK-NEXT: };
 // CHECK-NEXT: static GlobalMapUpdater updater;
 // CHECK-NEXT: }
-<<<<<<< HEAD
-=======
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_3IiEvPT_S0_S0_
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:   template <>
-// CHECK-NEXT:   kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim3()>() {
-// CHECK-NEXT:     return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_3IiEvPT_S0_S0_"});
-// CHECK-NEXT:   }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_3IfEvPT_S0_S0_
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:   template <>
-// CHECK-NEXT:   kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim4()>() {
-// CHECK-NEXT:     return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_3IfEvPT_S0_S0_"});
-// CHECK-NEXT:   }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_3IdEvPT_S0_S0_
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:   template <>
-// CHECK-NEXT:   kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim5()>() {
-// CHECK-NEXT:     return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_3IdEvPT_S0_S0_"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_410NoPointers8Pointers3Agg
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim6()>() {
-// CHECK-NEXT:   return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_410NoPointers8Pointers3Agg"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_6I3Agg7DerivedEvT_T0_i
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim7()>() {
-// CHECK-NEXT:   return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_6I3Agg7DerivedEvT_T0_i"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_7ILi3EEv16KArgWithPtrArrayIXT_EE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim8()>() {
-// CHECK-NEXT:   return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_7ILi3EEv16KArgWithPtrArrayIXT_EE"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-// CHECK: Definition of kernel_id of _Z18__sycl_kernel_ff_8N4sycl3_V117work_group_memoryIiEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim9()>() {
-// CHECK-NEXT: return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_8N4sycl3_V117work_group_memoryIiEE"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-
-// CHECK: Definition of kernel_id of _ZN28__sycl_kernel_free_functions4ff_9EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim10()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions4ff_9EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: Definition of kernel_id of _ZN28__sycl_kernel_free_functions5tests5ff_10EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim11()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5tests5ff_10EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  } 
-
-// CHECK: Definition of kernel_id of _ZN28__sycl_kernel_free_functions5tests2V15ff_11EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim12()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5tests2V15ff_11EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: Definition of kernel_id of _ZN26__sycl_kernel__GLOBAL__N_15ff_12EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim13()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN26__sycl_kernel__GLOBAL__N_15ff_12EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: Definition of kernel_id of _ZN28__sycl_kernel_free_functions5ff_13EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim14()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5ff_13EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: Definition of kernel_id of _ZN28__sycl_kernel_free_functions5tests5ff_13EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim15()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5tests5ff_13EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-//
-// CHECK: // Definition of kernel_id of _Z18__sycl_kernel_ff_9N4sycl3_V125dynamic_work_group_memoryIiEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim16()>() {
-// CHECK-NEXT:   return sycl::detail::get_kernel_id_impl(std::string_view{"_Z18__sycl_kernel_ff_9N4sycl3_V125dynamic_work_group_memoryIiEE"});
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_11N4sycl3_V114local_accessorIiLi1EEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim17()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_11N4sycl3_V114local_accessorIiLi1EEE"});
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_11IfEvN4sycl3_V114local_accessorIT_Li1EEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim18()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_11IfEvN4sycl3_V114local_accessorIT_Li1EEE"});
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_12N4sycl3_V17samplerE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim19()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_12N4sycl3_V17samplerE"});
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_13N4sycl3_V16streamE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim20()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_13N4sycl3_V16streamE"});
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_14N4sycl3_V13ext6oneapi12experimental13annotated_argIiJEEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim21()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_14N4sycl3_V13ext6oneapi12experimental13annotated_argIiJEEE"})
-
-// CHECK: Definition of kernel_id of _Z19__sycl_kernel_ff_15N4sycl3_V13ext6oneapi12experimental13annotated_ptrIiJEEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim22()>() {
-// CHECK-NEXT:  return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_15N4sycl3_V13ext6oneapi12experimental13annotated_ptrIiJEEE"});
-
-// CHECK-NEXT: }
-// CHECK-NEXT: }
-
-// CHECK: // Definition of kernel_id of _ZN28__sycl_kernel_free_functions5tests5ff_14EiPi
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim23()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5tests5ff_14EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-  
-// CHECK:  // Definition of kernel_id of _ZN28__sycl_kernel_free_functions5ff_15EiPi
-// CHECK-NEXT:  namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim24()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5ff_15EiPi"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-  
-// CHECK:  // Definition of kernel_id of _ZN28__sycl_kernel_free_functions5ff_16E3AggPS0_
-// CHECK-NEXT:  namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim25()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5ff_16E3AggPS0_"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: // Definition of kernel_id of _ZN28__sycl_kernel_free_functions5ff_17E7DerivedPS0_
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim26()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5ff_17E7DerivedPS0_"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: // Definition of kernel_id of _ZN28__sycl_kernel_free_functions5tests5ff_18ENS_3AggEPS1_
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT:  template <>
-// CHECK-NEXT:  kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim27()>() {
-// CHECK-NEXT:    return sycl::detail::get_kernel_id_impl(std::string_view{"_ZN28__sycl_kernel_free_functions5tests5ff_18ENS_3AggEPS1_"});
-// CHECK-NEXT:  }
-// CHECK-NEXT:  }
-
-// CHECK: // Definition of kernel_id of _Z19__sycl_kernel_ff_20N4sycl3_V18accessorIiLi1ELNS0_6access4modeE1026ELNS2_6targetE2014ELNS2_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEE
-// CHECK-NEXT: namespace sycl {
-// CHECK-NEXT: template <>
-// CHECK-NEXT: kernel_id ext::oneapi::experimental::get_kernel_id<__sycl_shim29()>() {
-// CHECK-NEXT:   return sycl::detail::get_kernel_id_impl(std::string_view{"_Z19__sycl_kernel_ff_20N4sycl3_V18accessorIiLi1ELNS0_6access4modeE1026ELNS2_6targetE2014ELNS2_11placeholderE0ENS0_3ext6oneapi22accessor_property_listIJEEEEE"});
-// CHECK-NEXT: }
-// CHECK-NEXT: }
->>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
