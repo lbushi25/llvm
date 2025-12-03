@@ -279,7 +279,11 @@ void ff_11(sycl::stream str) {
 
 // CHECK: FunctionDecl {{.*}}'void (sycl::stream)'
 // CHECK: ParmVarDecl {{.*}}str 'sycl::stream'
+<<<<<<< HEAD
 // CHECK: FunctionDecl {{.*}}'void (__global char *, sycl::range<1>, sycl::range<1>, sycl::id<1>, int) __attribute__((device_kernel))'
+=======
+// CHECK: FunctionDecl {{.*}}'void (__global char *, sycl::range<1>, sycl::range<1>, sycl::id<1>, int)'
+>>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK: ParmVarDecl {{.*}}__arg_Ptr '__global char *'
 // CHECK: ParmVarDecl {{.*}}__arg_AccessRange 'sycl::range<1>'
 // CHECK: ParmVarDecl {{.*}}__arg_MemRange 'sycl::range<1>'
@@ -296,7 +300,11 @@ void ff_12(sycl::ext::oneapi::experimental::annotated_arg<int> arg) {
 
 // CHECK: FunctionDecl {{.*}}'void (sycl::ext::oneapi::experimental::annotated_arg<int>)'
 // CHECK: ParmVarDecl {{.*}}arg 'sycl::ext::oneapi::experimental::annotated_arg<int>'
+<<<<<<< HEAD
 // CHECK: FunctionDecl {{.*}}'void (int) __attribute__((device_kernel))'
+=======
+// CHECK: FunctionDecl {{.*}}'void (int)'
+>>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK: ParmVarDecl {{.*}}__arg__obj 'int'
 // CHECK: CXXMemberCallExpr {{.*}}
 // CHECK-NEXT: MemberExpr {{.*}}.__init
@@ -309,7 +317,11 @@ void ff_13(sycl::ext::oneapi::experimental::annotated_ptr<int> ptr) {
 
 // CHECK: FunctionDecl {{.*}}'void (sycl::ext::oneapi::experimental::annotated_ptr<int>)'
 // CHECK: ParmVarDecl {{.*}}ptr 'sycl::ext::oneapi::experimental::annotated_ptr<int>'
+<<<<<<< HEAD
 // CHECK: FunctionDecl {{.*}}'void (int *) __attribute__((device_kernel))'
+=======
+// CHECK: FunctionDecl {{.*}}'void (int *)'
+>>>>>>> 6e5a42fb9419d4db5d93ada2ff39af7a6d9573ee
 // CHECK: ParmVarDecl {{.*}}__arg__obj 'int *'
 // CHECK: CXXMemberCallExpr {{.*}}
 // CHECK-NEXT: MemberExpr {{.*}}.__init
